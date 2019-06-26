@@ -5,9 +5,9 @@ ENV_ERROR=1;
 PERM_ERROR=2;
 BOOT_ERROR=3;
 
-UID=`id`
-UID=${UID#*=}
-UID=${UID%% *}
+UID=`id`;
+UID=${UID#*=};
+UID=${UID%% *};
 BOOT_DIR="";
 
 show_help()
