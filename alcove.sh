@@ -90,7 +90,7 @@ chmod 750 $BOOT_DIR/init.sh;
 
 alcove_mount()
 {
-  if [ -f $BOOT_DIR/isMounted ]; then
+  if [ -f $BOOT_DIR/tmp/isMounted ]; then
     return;
   fi;
 
@@ -101,7 +101,9 @@ alcove_mount()
   mount -t tmpfs tmpfs $BOOT_DIR/tmp;
 
   if [ -f $BOOT_DIR/alcove.binds ]; then
-    cat $BOOT_DIR/alcove.binds | while read SRC_PNT MNT_PNT; do
+    # Fix when user edited /alcove.binds.
+    cat $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds;
+    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
       mount -o bind $SRC_PNT $BOOT_DIR/$MNT_PNT;
     done;
   fi;
@@ -112,20 +114,24 @@ alcove_mount()
 
 alcove_umount()
 {
+  if [ ! -f $BOOT_DIR/tmp/isMounted ]; then
+    return;
+  fi;
+
   umount $BOOT_DIR/dev/pts;
   umount $BOOT_DIR/dev;
   umount $BOOT_DIR/proc;
   umount $BOOT_DIR/sys;
   umount $BOOT_DIR/tmp;
 
-  if [ -f $BOOT_DIR/alcove.binds ]; then
-    cat $BOOT_DIR/alcove.binds | while read SRC_PNT MNT_PNT; do
+  if [ -f $BOOT_DIR/tmp/.alcove.binds ]; then
+    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
       umount $BOOT_DIR/$MNT_PNT;
     done;
   fi;
 
   mount -o nosuid,remount /data;
-  rm $BOOT_DIR/isMounted;
+  rm $BOOT_DIR/tmp/isMounted;
 }
 
 alcove_boot()
