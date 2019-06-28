@@ -23,7 +23,7 @@ See also:
 HELP
 }
 
-umask 0002; # Fix default permission.
+umask 022; # Fix default permission.
 
 type chroot > /dev/null 2>&1 || {
   echo "Not found chroot!";
