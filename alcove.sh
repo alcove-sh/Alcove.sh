@@ -90,7 +90,7 @@ chmod 750 $BOOT_DIR/init.sh;
 
 alcove_mount()
 {
-  if [ -f $BOOT_DIR/tmp/isMounted ]; then
+  if [ -f $BOOT_DIR/tmp/.isMounted ]; then
     return;
   fi;
 
@@ -101,7 +101,7 @@ alcove_mount()
   mount -t tmpfs tmpfs $BOOT_DIR/tmp;
 
   if [ -f $BOOT_DIR/alcove.binds ]; then
-    # Fix when user edited /alcove.binds.
+    # Fix when user edited /alcove.binds .
     cat $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds;
     cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
       mount -o bind $SRC_PNT $BOOT_DIR/$MNT_PNT;
@@ -109,12 +109,12 @@ alcove_mount()
   fi;
 
   mount -o suid,remount /data;
-  echo "IS MOUNTED" > $BOOT_DIR/isMounted;
+  echo "IS MOUNTED" > $BOOT_DIR/tmp/.isMounted;
 }
 
 alcove_umount()
 {
-  if [ ! -f $BOOT_DIR/tmp/isMounted ]; then
+  if [ ! -f $BOOT_DIR/tmp/.isMounted ]; then
     return;
   fi;
 
@@ -131,18 +131,19 @@ alcove_umount()
   fi;
 
   mount -o nosuid,remount /data;
-  rm $BOOT_DIR/tmp/isMounted;
+  # Looks like umount /tmp has removed it.
+  #rm $BOOT_DIR/tmp/.isMounted;
 }
 
 alcove_boot()
 {
   unset LD_PRELOAD;
-  if [ ! -f $BOOT_DIR/etc/resolv.conf.ok ]; then
+  if [ ! -f $BOOT_DIR/etc/.resolv.conf.ok ]; then
     rm -f $BOOT_DIR/etc/resolv.conf;
     echo "nameserver 8.8.4.4" > $BOOT_DIR/etc/resolv.conf;
     echo "nameserver 8.8.8.8" >> $BOOT_DIR/etc/resolv.conf;
     chmod 644 $BOOT_DIR/etc/resolv.conf;
-    echo "DNS IS OK" > $BOOT_DIR/etc/resolv.conf.ok;
+    echo "DNS IS OK" > $BOOT_DIR/etc/.resolv.conf.ok;
   fi;
 
   [ ! -f $BOOT_DIR/init.sh ] && {
