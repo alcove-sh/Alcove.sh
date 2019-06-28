@@ -108,7 +108,10 @@ alcove_mount()
     done;
   fi;
 
-  mount -o suid,remount /data;
+  if [ -d /data ] && [ -d /sdcard ]; then
+    mount -o suid,remount /data;
+  fi;
+
   echo "IS MOUNTED" > $BOOT_DIR/tmp/.isMounted;
 }
 
@@ -129,7 +132,10 @@ alcove_umount()
     done;
   fi;
 
-  mount -o nosuid,remount /data;
+  if [ -d /data ] && [ -d /sdcard ]; then
+    mount -o nosuid,remount /data;
+  fi;
+
   #rm $BOOT_DIR/tmp/.isMounted;
   umount $BOOT_DIR/tmp;
 }
