@@ -122,7 +122,6 @@ alcove_umount()
   umount $BOOT_DIR/dev;
   umount $BOOT_DIR/proc;
   umount $BOOT_DIR/sys;
-  umount $BOOT_DIR/tmp;
 
   if [ -f $BOOT_DIR/tmp/.alcove.binds ]; then
     cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
@@ -131,8 +130,8 @@ alcove_umount()
   fi;
 
   mount -o nosuid,remount /data;
-  # Looks like umount /tmp has removed it.
   #rm $BOOT_DIR/tmp/.isMounted;
+  umount $BOOT_DIR/tmp;
 }
 
 alcove_boot()
