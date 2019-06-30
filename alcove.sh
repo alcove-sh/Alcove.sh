@@ -159,7 +159,15 @@ alcove_boot()
     exit $BOOT_ERROR;
   };
 
+
+  [ -f $BOOT_DIR/tmp/.isMounted ] && {
+    echo "Do not boot a system at same time!";
+    exit $BOOT_ERROR;
+  };
+
+  alcove_mount;
   chroot $BOOT_DIR /init.sh;
+  alcove_umount;
 }
 
 main()
@@ -177,9 +185,7 @@ main()
     alcove_init;
     ;;
   "boot")
-    alcove_mount;
     alcove_boot;
-    alcove_umount;
     ;;
   *)
     show_help;
