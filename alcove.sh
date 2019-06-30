@@ -161,7 +161,7 @@ alcove_boot()
 
 
   [ -f $BOOT_DIR/tmp/.isMounted ] && {
-    echo "Do not boot a system at same time!";
+    echo "Do not boot a same system twice or more!";
     exit $BOOT_ERROR;
   };
 
