@@ -104,8 +104,8 @@ alcove_mount()
 
   if [ -f $BOOT_DIR/alcove.binds ]; then
     # Fix when user edited /alcove.binds .
-    cat $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds;
-    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
+    sed -n '/^#/d;p' $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds;
+    cat $BOOT_DIR/tmp/.alcove.binds | sort -u | while read SRC_PNT MNT_PNT; do
       mount -o bind $SRC_PNT $BOOT_DIR/$MNT_PNT;
     done;
   fi;
@@ -129,7 +129,7 @@ alcove_umount()
   umount $BOOT_DIR/sys;
 
   if [ -f $BOOT_DIR/tmp/.alcove.binds ]; then
-    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
+    cat $BOOT_DIR/tmp/.alcove.binds | sort -ru | while read SRC_PNT MNT_PNT; do
       umount $BOOT_DIR/$MNT_PNT;
     done;
   fi;
