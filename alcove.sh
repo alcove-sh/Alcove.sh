@@ -12,7 +12,7 @@ BOOT_DIR="";
 
 show_help()
 {
-cat <<HELP
+  cat <<HELP
 alcove - a script to run linux on termux.
 
 Usage: ${0##*/} <init|boot> <bootdir>
@@ -47,7 +47,7 @@ check_env()
 
 alcove_init()
 {
-cat > $BOOT_DIR/init.sh <<INIT_SCRIPT
+  cat > $BOOT_DIR/init.sh <<INIT_SCRIPT
 #!/bin/sh
 
 unset PREFIX TMPDIR HOME SHELL;
@@ -87,7 +87,7 @@ else
 fi;
 INIT_SCRIPT
 
-chmod 750 $BOOT_DIR/init.sh;
+  chmod 750 $BOOT_DIR/init.sh;
 }
 
 alcove_mount()
