@@ -10,6 +10,9 @@ UID=${UID#*=};
 UID=${UID%% *};
 BOOT_DIR="";
 
+umask 022; # Fix default permission.
+
+
 show_help()
 {
   cat <<HELP
@@ -22,8 +25,6 @@ See also:
   https://github.com/95e2/linux-on-termux
 HELP
 }
-
-umask 022; # Fix default permission.
 
 type chroot > /dev/null 2>&1 || {
   echo "Not found chroot!";
