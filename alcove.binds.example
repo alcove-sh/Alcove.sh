@@ -1,0 +1,4 @@
+# INTERNAL SDCARD(5.1)
+#/storage/sdcard0  /mnt/intsd
+# EXTERNAL SDCARD(5.1)
+#/storage/sdcard1  /mnt/extsd
