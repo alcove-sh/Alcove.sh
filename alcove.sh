@@ -73,21 +73,10 @@ echo "/_/   \\\\_\\\\_|\\\\___\\\\___/ \\\\_/ \\\\___| v1.2.4";
 echo "                              ";
 echo " A chroot scripts to run linux on termux.";
 
-# TODO: This is not available on most systems
-#       unless the su symlinked from busybox.
-#su - root; exit \$?;
-
-# XXX: dash not support \`type -p\`
-type bash > /dev/null 2>&1;
-if [ \$? = 0 ]; then
-  export SHELL="\`type bash | { read _ _ path; echo \$path; }\`";
-  bash -l; exit \$?;
-else
-  export SHELL="\`type sh | { read _ _ path; echo \$path; }\`";
-  sh -l; exit \$?;
-fi;
+su - root; exit \$?;
 INIT_SCRIPT
 
+  chmod 755 $BOOT_DIR;
   chmod 750 $BOOT_DIR/init.sh;
 }
 
@@ -102,6 +91,11 @@ alcove_mount()
   mount -o bind /proc $BOOT_DIR/proc;
   mount -o bind /sys $BOOT_DIR/sys;
   mount -t tmpfs tmpfs $BOOT_DIR/tmp;
+
+  if [ ! -d $BOOT_DIR/dev/shm ]; then
+    mkdir $BOOT_DIR/dev/shm && mount -t tmpfs tmpfs $BOOT_DIR/dev/shm \
+                            && chmod 1777 $BOOT_DIR/dev/shm;
+  fi;
 
   if [ -f $BOOT_DIR/alcove.binds ]; then
     # Fix when user edited /alcove.binds .
@@ -122,6 +116,10 @@ alcove_umount()
 {
   if [ ! -f $BOOT_DIR/tmp/.isMounted ]; then
     return;
+  fi;
+
+  if [ -d $BOOT_DIR/dev/shm ]; then
+    umount $BOOT_DIR/dev/shm && rm -r $BOOT_DIR/dev/shm;
   fi;
 
   umount $BOOT_DIR/dev/pts;
