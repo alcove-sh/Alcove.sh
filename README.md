@@ -19,6 +19,9 @@ mount -o rw,remount /system;
 # install alcove.sh to /system
 cp alcove.sh /system/xbin/alcove;
 
+# Mark script executable
+chmod 755 /system/xbin/alcove;
+
 # Make /system readonly(Optional)
 mount -o ro,remount /system;
 
@@ -54,4 +57,10 @@ If you didn't installed any system before, you may go back to top read the usage
 
 ## Patches List ##
 See [patches](./patches)
+
+## Proot Edition ##
+See [linux-on-termux](https://github.com/uzilla/linux-on-termux)
+
+
+Note: The patches of apt just copy from [LinuxDeploy](https://github.com/meefik/linuxdeploy-cli/blob/5f18caf3fa8c4760a8e79287384e14d69b19e56c/include/bootstrap/ubuntu/deploy.sh#L32), so special thanks to meefik!
 
