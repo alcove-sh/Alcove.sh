@@ -88,6 +88,7 @@ else
 fi;
 INIT_SCRIPT
 
+  chmod 755 $BOOT_DIR
   chmod 750 $BOOT_DIR/init.sh;
 }
 
