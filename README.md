@@ -32,7 +32,7 @@ mkdir /data/debian;
 cd /data/debian;
 
 # Download rootfs.tar.{bz,gz,xz}
-# For example, download a debian rootfs
+# For example download a debian rootfs
 wget http://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/debian/buster/arm64/default/20190709_15%3A39/rootfs.tar.xz;
 
 # Extract(or Unpack) rootfs.tar.{bz,gz,xz}
@@ -49,7 +49,7 @@ alcove boot /data/debian;
 ```
 
 ## How to boot? ##
-If you didn't installed any system before, you may go back to top read the usage to learn how to install a system. If you have installed and initiated a system, you can simply just use alcove boot **/path/to/system-directory** to boot it.
+If you didn't installed any system before, you may go back to top read the usage to learn how to install a system. If you have installed and initiated a system, you can simply just use `alcove boot **/path/to/system-directory**` to boot it.
 
 ## Requires ##
   - Rooted(Android)

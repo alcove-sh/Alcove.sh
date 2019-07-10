@@ -1,1 +1,1 @@
-patchs/common/group-patch-android.sh
+patches/common/group-patch-android.sh
