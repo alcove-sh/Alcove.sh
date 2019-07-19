@@ -1,5 +1,5 @@
-Alcove.sh
-============
+Alcove.sh(v1.2.5)
+==================
 
 Yet Another chroot script to run Linux on Android.
 

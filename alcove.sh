@@ -14,9 +14,9 @@ if [ x"$UID" = "x" ]; then
 fi
 
 BOOT_DIR=""
-umask 022; # Fix default permission.
+umask 022 # Fix default permission.
 
-
+# Prechecks
 type chroot > /dev/null 2>&1 || {
   echo "Not found chroot!"
   echo "Please install chroot and try again!"
@@ -28,7 +28,7 @@ type chroot > /dev/null 2>&1 || {
   exit $PERM_ERROR
 }
 
-
+# Functions
 show_help()
 {
   cat <<HELP
