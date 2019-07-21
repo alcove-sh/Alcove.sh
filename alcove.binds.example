@@ -3,6 +3,6 @@
 
 # NOTICE: To use below binding, you must be ensure that
 #         you have removed the 00-extsd in /alcove-hooks .
-#
+
 # EXTERNAL SDCARD(API 22)
 #/storage/sdcard1  /mnt/extsd

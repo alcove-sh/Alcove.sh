@@ -4,12 +4,12 @@
 
 NAME="zram"
 DEVICE="/dev/block/zram0"
-CONFDIR="/sys/block/zram0"
+CFGDIR="/sys/block/zram0"
 
 start() {
   stop > /dev/null 2>&1
   {
-    echo $((1*1024*1024*1024)) > ${CONFDIR}/disksize
+    echo $((1*1024*1024*1024)) > ${CFGDIR}/disksize
     mkswap ${DEVICE}
     swapon ${DEVICE}
   } > /dev/null 2>&1
@@ -17,6 +17,7 @@ start() {
 
 stop() {
   swapoff ${DEVICE}
+  echo 1 > ${CFGDIR}/reset
 }
 
 case "$1" in
