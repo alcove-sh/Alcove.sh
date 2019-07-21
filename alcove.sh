@@ -86,43 +86,43 @@ echo " A chroot scripts to run linux on termux."
 
 if [ -f /tmp/.alcove.running ]; then
   echo "Do not run /init.sh on a same system twice or more!"
-  exit 0
+  exit 1
 fi
 
 echo "IS RUNNING" > /tmp/.alcove.running
 
 if [ -d /alcove-hooks ]; then
   rm -rf /tmp/.alcove-hooks # Path-Safe
-  cp -r /alcove-hooks /tmp/.alcove-hooks
+  cp -rp /alcove-hooks /tmp/.alcove-hooks
 
   echo "Starting..."
   for s in /tmp/.alcove-hooks/*; do
-    \$s "start";
+    \$s "start"
 
     if [ \$? = 0 ]; then
-      echo "[  OK  ] \$s";
+      echo "[  OK  ] \$s"
     else
-      echo "[FAILED] \$s";
+      echo "[FAILED] \$s"
     fi
   done
 
-  su - root; ret=\$?;
+  su - root; ret=\$?
 
   echo "Stopping..."
   for s in /tmp/.alcove-hooks/*; do
-    \$s "stop";
+    \$s "stop"
 
     if [ \$? = 0 ]; then
-      echo "[  OK  ] \$s";
+      echo "[  OK  ] \$s"
     else
-      echo "[FAILED] \$s";
+      echo "[FAILED] \$s"
     fi
   done
 else
-  su - root; ret=\$?;
+  su - root; ret=\$?
 fi
 
-# Clean up...
+# Cleanup
 rm /tmp/.alcove.running
 exit \$ret
 INIT_SCRIPT
