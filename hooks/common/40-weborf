@@ -1,14 +1,15 @@
 #! /bin/sh
 
-# Filename: /alcove-hooks/22-sshd
+# Filename: /alcove-hooks/40-weborf
 
-NAME="sshd"
-COMMAND="/usr/sbin/sshd"
+# NOTICE: This hook may not safe(run as root), so please consider carefully.
+
+NAME="weborf"
 PIDFILE="/var/run/${NAME}.pid"
 
 start() {
   stop > /dev/null 2>&1
-  nohup  ${COMMAND} > /dev/null 2>&1 &
+  nohup  weborf -b /mnt -p 80 > /dev/null 2>&1 &
   echo $! > /var/run/${NAME}.pid
 }
 
