@@ -3,8 +3,8 @@
 # Filename: /alcove-hooks/00-zram
 
 NAME="zram"
-CONFDIR="/sys/block/zram0"
 DEVICE="/dev/block/zram0"
+CONFDIR="/sys/block/zram0"
 
 start() {
   stop > /dev/null 2>&1
