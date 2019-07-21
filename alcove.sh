@@ -16,7 +16,10 @@ fi
 BOOT_DIR=""
 umask 022 # Fix default permission.
 
+#
 # Prechecks
+#
+
 type chroot > /dev/null 2>&1 || {
   echo "Not found chroot!"
   echo "Please install chroot and try again!"
@@ -28,7 +31,10 @@ type chroot > /dev/null 2>&1 || {
   exit $PERM_ERROR
 }
 
+#
 # Functions
+#
+
 show_help()
 {
   cat <<HELP
@@ -78,7 +84,47 @@ echo "/_/   \\\\_\\\\_|\\\\___\\\\___/ \\\\_/ \\\\___| v1.2.4"
 echo "                              "
 echo " A chroot scripts to run linux on termux."
 
-su - root; exit \$?
+if [ -f /tmp/.alcove.running ]; then
+  echo "Do not run /init.sh on a same system twice or more!"
+  exit 0
+fi
+
+echo "IS RUNNING" > /tmp/.alcove.running
+
+if [ -d /alcove-hooks ]; then
+  rm -rf /tmp/.alcove-hooks # Path-Safe
+  cp -r /alcove-hooks /tmp/.alcove-hooks
+
+  echo "Starting..."
+  for s in /tmp/.alcove-hooks/*; do
+    \$s "start";
+
+    if [ \$? = 0 ]; then
+      echo "[  OK  ] \$s";
+    else
+      echo "[FAILED] \$s";
+    fi
+  done
+
+  su - root; ret=\$?;
+
+  echo "Stopping..."
+  for s in /tmp/.alcove-hooks/*; do
+    \$s "stop";
+
+    if [ \$? = 0 ]; then
+      echo "[  OK  ] \$s";
+    else
+      echo "[FAILED] \$s";
+    fi
+  done
+else
+  su - root; ret=\$?;
+fi
+
+# Clean up...
+rm /tmp/.alcove.running
+exit \$ret
 INIT_SCRIPT
 
   chmod 755 $BOOT_DIR
@@ -87,7 +133,7 @@ INIT_SCRIPT
 
 alcove_mount()
 {
-  if [ -f $BOOT_DIR/tmp/.isMounted ]; then
+  if [ -f $BOOT_DIR/tmp/.alcove.mounted ]; then
     return
   fi
 
@@ -103,8 +149,8 @@ alcove_mount()
   fi
 
   if [ -f $BOOT_DIR/alcove.binds ]; then
-    # Fix when user edited /alcove.binds .
-    sed -n '/^#/d;p' $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds
+    # Fix error when user edited /alcove.binds .
+    sed -n '/^#/d;/^[ \t]*$/d;p' $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds
     cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT MNT_PNT; do
       mount -o bind $SRC_PNT $BOOT_DIR/$MNT_PNT
     done
@@ -114,12 +160,12 @@ alcove_mount()
     mount -o suid,remount /data
   fi
 
-  echo "IS MOUNTED" > $BOOT_DIR/tmp/.isMounted
+  echo "IS MOUNTED" > $BOOT_DIR/tmp/.alcove.mounted
 }
 
 alcove_umount()
 {
-  if [ ! -f $BOOT_DIR/tmp/.isMounted ]; then
+  if [ ! -f $BOOT_DIR/tmp/.alcove.mounted ]; then
     return
   fi
 
@@ -142,7 +188,7 @@ alcove_umount()
     mount -o nosuid,remount /data
   fi
 
-  #rm $BOOT_DIR/tmp/.isMounted
+  #rm $BOOT_DIR/tmp/.alcove.mounted
   umount $BOOT_DIR/tmp
 }
 
@@ -164,7 +210,7 @@ alcove_boot()
   }
 
 
-  [ -f $BOOT_DIR/tmp/.isMounted ] && {
+  [ -f $BOOT_DIR/tmp/.alcove.mounted ] && {
     echo "Do not boot a same system twice or more!"
     exit $BOOT_ERROR
   }

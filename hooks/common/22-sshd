@@ -1,0 +1,27 @@
+#! /bin/sh
+
+# Filename: /alcove-hooks/22-sshd
+
+NAME="sshd"
+COMMAND="/usr/sbin/sshd"
+PIDFILE="/var/run/${NAME}.pid"
+
+start() {
+  stop > /dev/null 2>&1
+  nohup  ${COMMAND} > /dev/null 2>&1 &
+  echo $! > /var/run/${NAME}.pid
+}
+
+stop() {
+  kill -s 15 $(cat ${PIDFILE})
+  rm -f ${PIDFILE}
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+esac
