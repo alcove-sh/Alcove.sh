@@ -10,7 +10,7 @@ start() {
   stop > /dev/null 2>&1
   nohup ${COMMAND} --conf-path=/root/.aria2/aria2.conf \
                 --enable-rpc=true > /dev/null 2>&1 &
-  echo $! > /var/run/${NAME}.pid
+  echo $! > ${PIDFILE}
 }
 
 stop() {

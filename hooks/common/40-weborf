@@ -10,7 +10,7 @@ PIDFILE="/var/run/${NAME}.pid"
 start() {
   stop > /dev/null 2>&1
   nohup  weborf -b /mnt -p 80 > /dev/null 2>&1 &
-  echo $! > /var/run/${NAME}.pid
+  echo $! > ${PIDFILE}
 }
 
 stop() {
