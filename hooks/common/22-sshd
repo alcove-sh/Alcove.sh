@@ -16,9 +16,8 @@ stop() {
   kill -s 15 $(cat ${PIDFILE})
   rm -f ${PIDFILE}
 
-  while ps -ef | grep -E '^sshd'; do
-    killall sshd # Kill all ssh connections.
-  done
+  # Kill all ssh connections.
+  pgrep '^sshd' | xargs -i kill -s 15 {}
 }
 
 case "$1" in
