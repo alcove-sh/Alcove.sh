@@ -109,7 +109,7 @@ if [ -d /alcove-hooks ]; then
   su - root; ret=\$?
 
   echo "Stopping..."
-  for s in /tmp/.alcove-hooks/*; do
+  ls /tmp/.alcove-hooks/* | sort -r | while read s; do
     \$s "stop"
 
     if [ \$? = 0 ]; then
