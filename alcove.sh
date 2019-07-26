@@ -123,11 +123,11 @@ COLOR_BOLD_RED="\033[1;31m"
 COLOR_BOLD_GREEN="\033[1;32m"
 
 clear_print() {
-  echo -e -n "\r\033[K\${@}"
+  printf "\r\033[K\${@}"
 }
 
 print_msg() {
-  echo -e -n "\${@}"
+  printf "\${@}"
 }
 
 print_ok() {
