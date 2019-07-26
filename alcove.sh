@@ -29,7 +29,7 @@ PERM_ERROR=2
 BOOT_ERROR=3
 
 # XXX: `id -u` may not work on android.
-if [ x"$UID" = "x" ]; then
+if [ x"${UID}" = "x" ]; then
   UID=`id`
   UID=${UID#*=}
   UID=${UID%% *}
@@ -46,12 +46,12 @@ umask 022 # Fix default permission.
 type chroot > /dev/null 2>&1 || {
   echo "Not found chroot!"
   echo "Please install chroot and try again!"
-  exit $ENV_ERROR
+  exit ${ENV_ERROR}
 }
 
-[ "$UID" != "0" ] && {
+[ "${UID}" != "0" ] && {
   echo "Please run ${0##*/} as root!"
-  exit $PERM_ERROR
+  exit ${PERM_ERROR}
 }
 
 #
@@ -73,16 +73,16 @@ HELP
 
 check_env()
 {
-  if [ x$BOOT_DIR = "x" ] || [ ! -d $BOOT_DIR ]; then
-    echo "Not found path [$BOOT_DIR]!"
-    exit $ENV_ERROR
+  if [ x${BOOT_DIR} = "x" ] || [ ! -d ${BOOT_DIR} ]; then
+    echo "Not found path [${BOOT_DIR}]!"
+    exit ${ENV_ERROR}
   fi
-  [ "$BOOT_DIR" = "/" ] && exit $ENV_ERROR
+  [ "${BOOT_DIR}" = "/" ] && exit ${ENV_ERROR}
 }
 
 alcove_init()
 {
-  cat > $BOOT_DIR/init.sh <<INIT_SCRIPT
+  cat > ${BOOT_DIR}/init.sh <<INIT_SCRIPT
 #!/bin/sh
 
 unset PREFIX TMPDIR HOME SHELL
@@ -93,7 +93,7 @@ unset EXTERNAL_STORAGE PROOT_TMP_DIR
 export TERM="xterm"
 export HOME="/root"
 export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
-export PATH="\$PATH:/usr/local/bin:/opt/bin"
+export PATH="\${PATH}:/usr/local/bin:/opt/bin"
 
 # Preload profile
 . /etc/profile
@@ -114,68 +114,94 @@ fi
 
 echo "IS RUNNING" > /tmp/.alcove.running
 
+#
+# Event-Hooks
+#
+
+COLOR_RESET="\033[0m"
+COLOR_BOLD_RED="\033[1;31m"
+COLOR_BOLD_GREEN="\033[1;32m"
+
+clear_print() {
+  echo -e -n "\r\033[K\${@}"
+}
+
+print_msg() {
+  echo -e -n "\${@}"
+}
+
+print_ok() {
+  clear_print "[  \${COLOR_BOLD_GREEN}OK\${COLOR_RESET}  ] \${@}\n"
+}
+
+print_failed() {
+  clear_print "[\${COLOR_BOLD_RED}FAILED\${COLOR_RESET}] \${@}\n"
+}
+
 if [ -d /alcove-hooks ]; then
   rm -rf /tmp/.alcove-hooks # Path-Safe
   cp -rp /alcove-hooks /tmp/.alcove-hooks
 
   echo "Starting..."
   for s in /tmp/.alcove-hooks/*; do
-    \$s "start"
+    print_msg "Starting \${s} ..."
+    \${s} "start"
 
-    if [ \$? = 0 ]; then
-      echo "[  OK  ] \$s"
+    if [ \${?} = 0 ]; then
+      print_ok "\${s}"
     else
-      echo "[FAILED] \$s"
+      print_failed "\${s}"
     fi
   done
 
-  su - root; ret=\$?
+  su - root; ret=\${?}
 
   echo "Stopping..."
   ls /tmp/.alcove-hooks/* | sort -r | while read s; do
-    \$s "stop"
+    print_msg "Stopping \${s} ..."
+    \${s} "stop"
 
-    if [ \$? = 0 ]; then
-      echo "[  OK  ] \$s"
+    if [ \${?} = 0 ]; then
+      print_ok "\${s}"
     else
-      echo "[FAILED] \$s"
+      print_failed "\${s}"
     fi
   done
 else
-  su - root; ret=\$?
+  su - root; ret=\${?}
 fi
 
 # Cleanup
 rm /tmp/.alcove.running
-exit \$ret
+exit \${ret}
 INIT_SCRIPT
 
-  chmod 755 $BOOT_DIR
-  chmod 750 $BOOT_DIR/init.sh
+  chmod 755 ${BOOT_DIR}
+  chmod 750 ${BOOT_DIR}/init.sh
 }
 
 alcove_mount()
 {
-  if [ -f $BOOT_DIR/tmp/.alcove.mounted ]; then
+  if [ -f ${BOOT_DIR}/tmp/.alcove.mounted ]; then
     return
   fi
 
-  mount -o bind /dev $BOOT_DIR/dev
-  mount -o bind /dev/pts $BOOT_DIR/dev/pts
-  mount -o bind /proc $BOOT_DIR/proc
-  mount -o bind /sys $BOOT_DIR/sys
-  mount -t tmpfs tmpfs $BOOT_DIR/tmp
+  mount -o bind /dev ${BOOT_DIR}/dev
+  mount -o bind /dev/pts ${BOOT_DIR}/dev/pts
+  mount -o bind /proc ${BOOT_DIR}/proc
+  mount -o bind /sys ${BOOT_DIR}/sys
+  mount -t tmpfs tmpfs ${BOOT_DIR}/tmp
 
-  if [ ! -d $BOOT_DIR/dev/shm ]; then
-    mkdir $BOOT_DIR/dev/shm && mount -t tmpfs tmpfs $BOOT_DIR/dev/shm \
-                            && chmod 1777 $BOOT_DIR/dev/shm
+  if [ ! -d ${BOOT_DIR}/dev/shm ]; then
+    mkdir ${BOOT_DIR}/dev/shm && mount -t tmpfs tmpfs ${BOOT_DIR}/dev/shm \
+                            && chmod 1777 ${BOOT_DIR}/dev/shm
   fi
 
-  if [ -f $BOOT_DIR/alcove.binds ]; then
+  if [ -f ${BOOT_DIR}/alcove.binds ]; then
     # Fix error when user edited /alcove.binds .
-    sed -n '/^#/d;/^[ \t]*$/d;p' $BOOT_DIR/alcove.binds > $BOOT_DIR/tmp/.alcove.binds
-    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT DST_MNT; do
-      mount -o bind $SRC_PNT $BOOT_DIR/$DST_MNT
+    sed -n '/^#/d;/^[ \t]*$/d;p' ${BOOT_DIR}/alcove.binds > ${BOOT_DIR}/tmp/.alcove.binds
+    cat ${BOOT_DIR}/tmp/.alcove.binds | while read SRC_PNT DST_MNT; do
+      mount -o bind ${SRC_PNT} ${BOOT_DIR}/${DST_MNT}
     done
   fi
 
@@ -183,27 +209,27 @@ alcove_mount()
     mount -o suid,remount /data
   fi
 
-  echo "IS MOUNTED" > $BOOT_DIR/tmp/.alcove.mounted
+  echo "IS MOUNTED" > ${BOOT_DIR}/tmp/.alcove.mounted
 }
 
 alcove_umount()
 {
-  if [ ! -f $BOOT_DIR/tmp/.alcove.mounted ]; then
+  if [ ! -f ${BOOT_DIR}/tmp/.alcove.mounted ]; then
     return
   fi
 
-  if [ -d $BOOT_DIR/dev/shm ]; then
-    umount $BOOT_DIR/dev/shm && rm -r $BOOT_DIR/dev/shm
+  if [ -d ${BOOT_DIR}/dev/shm ]; then
+    umount ${BOOT_DIR}/dev/shm && rm -r ${BOOT_DIR}/dev/shm
   fi
 
-  umount $BOOT_DIR/dev/pts
-  umount $BOOT_DIR/dev
-  umount $BOOT_DIR/proc
-  umount $BOOT_DIR/sys
+  umount ${BOOT_DIR}/dev/pts
+  umount ${BOOT_DIR}/dev
+  umount ${BOOT_DIR}/proc
+  umount ${BOOT_DIR}/sys
 
-  if [ -f $BOOT_DIR/tmp/.alcove.binds ]; then
-    cat $BOOT_DIR/tmp/.alcove.binds | while read SRC_PNT DST_MNT; do
-      umount $BOOT_DIR/$DST_MNT
+  if [ -f ${BOOT_DIR}/tmp/.alcove.binds ]; then
+    cat ${BOOT_DIR}/tmp/.alcove.binds | while read SRC_PNT DST_MNT; do
+      umount ${BOOT_DIR}/${DST_MNT}
     done
   fi
 
@@ -211,49 +237,49 @@ alcove_umount()
     mount -o nosuid,remount /data
   fi
 
-  #rm $BOOT_DIR/tmp/.alcove.mounted
-  umount $BOOT_DIR/tmp
+  #rm ${BOOT_DIR}/tmp/.alcove.mounted
+  umount ${BOOT_DIR}/tmp
 }
 
 alcove_boot()
 {
   unset LD_PRELOAD
-  if [ ! -f $BOOT_DIR/etc/.resolv.conf.ok ]; then
-    rm -f $BOOT_DIR/etc/resolv.conf
-    echo "nameserver 8.8.4.4" > $BOOT_DIR/etc/resolv.conf
-    echo "nameserver 8.8.8.8" >> $BOOT_DIR/etc/resolv.conf
-    chmod 644 $BOOT_DIR/etc/resolv.conf
-    echo "DNS IS OK" > $BOOT_DIR/etc/.resolv.conf.ok
+  if [ ! -f ${BOOT_DIR}/etc/.resolv.conf.ok ]; then
+    rm -f ${BOOT_DIR}/etc/resolv.conf
+    echo "nameserver 8.8.4.4" > ${BOOT_DIR}/etc/resolv.conf
+    echo "nameserver 8.8.8.8" >> ${BOOT_DIR}/etc/resolv.conf
+    chmod 644 ${BOOT_DIR}/etc/resolv.conf
+    echo "DNS IS OK" > ${BOOT_DIR}/etc/.resolv.conf.ok
   fi
 
-  [ ! -f $BOOT_DIR/init.sh ] && {
-    echo "Not found [$BOOT_DIR/init.sh]"
+  [ ! -f ${BOOT_DIR}/init.sh ] && {
+    echo "Not found [${BOOT_DIR}/init.sh]"
     echo "Have you run ${0##*/} init?"
-    exit $BOOT_ERROR
+    exit ${BOOT_ERROR}
   }
 
 
-  [ -f $BOOT_DIR/tmp/.alcove.mounted ] && {
+  [ -f ${BOOT_DIR}/tmp/.alcove.mounted ] && {
     echo "Do not boot a same system twice or more!"
-    exit $BOOT_ERROR
+    exit ${BOOT_ERROR}
   }
 
   alcove_mount
-  chroot $BOOT_DIR /init.sh
+  chroot ${BOOT_DIR} /init.sh
   alcove_umount
 }
 
 main()
 {
-  if [ $# -lt 2 ]; then
+  if [ ${#} -lt 2 ]; then
     show_help
-    exit $NO_ERROR
+    exit ${NO_ERROR}
   fi
 
-  BOOT_DIR=`cd $2; pwd` > /dev/null 2>&1
+  BOOT_DIR=`cd ${2}; pwd` > /dev/null 2>&1
 
   check_env
-  case "$1" in
+  case "${1}" in
     "init")
     alcove_init
     ;;
@@ -268,4 +294,4 @@ main()
 }
 
 
-main "$@"
+main "${@}"
