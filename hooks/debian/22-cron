@@ -1,0 +1,21 @@
+#! /bin/sh
+
+# Filename: /alcove-hooks/22-cron
+
+start() {
+  service cron start > /dev/null 2>&1
+}
+
+stop() {
+  service cron stop > /dev/null 2>&1
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+esac
+
