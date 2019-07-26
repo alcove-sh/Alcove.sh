@@ -119,11 +119,12 @@ echo "IS RUNNING" > /tmp/.alcove.running
 #
 
 COLOR_RESET="\033[0m"
+COLOR_CLEAR="\r\033[K"
 COLOR_BOLD_RED="\033[1;31m"
 COLOR_BOLD_GREEN="\033[1;32m"
 
 clear_print() {
-  printf "\r\033[K\${@}"
+  printf "\${COLOR_CLEAR}\${@}"
 }
 
 print_msg() {
