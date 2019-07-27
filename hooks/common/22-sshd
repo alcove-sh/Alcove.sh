@@ -17,7 +17,7 @@ stop() {
   rm -f ${PIDFILE}
 
   # Kill all ssh connections.
-  pgrep '^sshd' | xargs -r kill -s 15
+  pgrep "^${NAME}" | xargs -r kill -s 15
 }
 
 case "${1}" in
