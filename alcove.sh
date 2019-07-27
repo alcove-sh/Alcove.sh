@@ -195,7 +195,7 @@ alcove_mount()
 
   if [ ! -d ${BOOT_DIR}/dev/shm ]; then
     mkdir ${BOOT_DIR}/dev/shm && mount -t tmpfs tmpfs ${BOOT_DIR}/dev/shm \
-                            && chmod 1777 ${BOOT_DIR}/dev/shm
+                              && chmod 1777 ${BOOT_DIR}/dev/shm
     echo "SHM LOCKED" > ${BOOT_DIR}/tmp/.alcove.shmlock
   fi
 
