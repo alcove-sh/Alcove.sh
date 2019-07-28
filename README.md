@@ -17,15 +17,28 @@ Yet Another chroot script to run Linux on Android.
 ## How to boot? ##
 If you didn't installed any system before, you may go back to top read the usage to learn how to install a system. If you have installed and initiated a system, you can simply just use `alcove boot **/path/to/system-directory**` to boot it.
 
-## Requires ##
+## Requirement ##
   - Rooted(Android)
   - Busybox(or toybox)
 
 ## Patch List ##
 See [patches](./patches)
 
+## Alcove.binds ##
+alcove.binds is a fstab-like file to bind host directory/file to **NEWROOT**'s directory/file.
+
+For example:
+```fstab
+# Syntax:
+#   source_dir  newroot_dir
+#   Use '#' at begin of a line to comment it.
+
+# sdcard
+/sdcard  /mnt/intsd
+```
+
 ## Event-Hooks ##
-Event-Hooks is little daemon manager for chroot-environment. To use it you need just create new directory named alcove-hooks in **NEWROOT**(/alcove-hooks). There are only two events for the scripts which under the /alcove-hooks, **start** and **stop**.
+Event-Hooks is a little daemon manager for chroot-environment. To use it you need just create new directory named alcove-hooks in **NEWROOT**(/alcove-hooks). There are only two events for the *script which under the /alcove-hooks*, **start** and **stop**.
 
 Also is is similar to other SysV Init. They are created because there are too many Linux distribution use systemd to replace init.d etc, but it cannot work on chroot-environment.
 
@@ -35,7 +48,7 @@ There are two good and standard examples for you, click [00-extsd](hooks/common/
 See [linux-on-termux](https://github.com/uzilla/linux-on-termux)
 
 
-Note: The patches of apt just copy from [LinuxDeploy](https://github.com/meefik/linuxdeploy-cli/blob/5f18caf3fa8c4760a8e79287384e14d69b19e56c/include/bootstrap/ubuntu/deploy.sh#L32), so special thanks to meefik!
+Note: The patch of apt just copy from [LinuxDeploy](https://github.com/meefik/linuxdeploy-cli/blob/5f18caf3fa8c4760a8e79287384e14d69b19e56c/include/bootstrap/ubuntu/deploy.sh#L32), so special thanks to meefik!
 
 ## License ##
 ```license
