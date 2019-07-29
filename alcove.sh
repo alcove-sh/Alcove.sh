@@ -240,7 +240,7 @@ alcove_umount()
     mount -o nosuid,remount /data
   fi
 
-  #rm ${BOOT_DIR}/tmp/.alcove.mounted
+  rm ${BOOT_DIR}/tmp/.alcove.mounted
   umount ${BOOT_DIR}/tmp
 }
 
