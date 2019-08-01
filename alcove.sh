@@ -283,7 +283,7 @@ main()
 
   check_env
   case "${1}" in
-    "init")
+  "init")
     alcove_init
     ;;
   "boot")
@@ -291,7 +291,7 @@ main()
     ;;
   *)
     show_help
-    exit 0
+    exit ${NO_ERROR}
     ;;
   esac
 }
