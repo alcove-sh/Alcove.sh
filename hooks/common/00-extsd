@@ -5,7 +5,7 @@
 # NOTICE: To use this hook, you must be ensure that
 #         you have been commented the related path on alcove.binds .
 
-NAME="sshd"
+NAME="extsd"
 DEVICE="/dev/block/mmcblk1p2"
 DIRPATH="/mnt/extsd"
 
