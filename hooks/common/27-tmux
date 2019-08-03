@@ -1,0 +1,15 @@
+#! /bin/sh
+
+# Filename: /alcove-hooks/27-tmux
+
+NAME="tmux"
+
+case "$1" in
+  "start")
+    : Do nothing
+    ;;
+  "stop")
+    pgrep "^${NAME}" | xargs -r kill -s 15
+    ;;
+esac
+
