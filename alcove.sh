@@ -109,7 +109,7 @@ echo " A chroot scripts to run linux on termux."
 
 if [ -f /tmp/.alcove.running ]; then
   echo "Do not run /init.sh on a same system twice or more!"
-  exit -1
+  exit 255
 fi
 
 echo "IS RUNNING" > /tmp/.alcove.running
