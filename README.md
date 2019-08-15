@@ -1,4 +1,4 @@
-Alcove.sh(v1.2.5)
+Alcove.sh
 ==================
 
 Yet Another chroot script to run Linux on Android.
@@ -40,11 +40,11 @@ For example:
 ## Event-Hooks ##
 Event-Hooks is a little daemon manager for chroot-environment. To use it you need just create new directory named alcove-hooks in **NEWROOT**(/alcove-hooks). There are only two events for the *script which under the /alcove-hooks*, **start** and **stop**.
 
-Also is is similar to other SysV Init. They are created because there are too many Linux distribution use systemd to replace init.d etc, but it cannot work on chroot-environment.
+Also it is similar to other SysvInit scripts. They are created because there are too many Linux distribution use systemd to replace init.d etc, but it cannot work on chroot-environment.
 
-There are two good and standard examples for you, click [00-extsd](hooks/common/00-extsd) and [22-sshd](hooks/common/22-sshd) to see. 
+We have two good and standard examples for you, click [00-extsd](hooks/common/00-extsd) and [22-sshd](hooks/common/22-sshd) to see. 
 
-## Non-root Edition ##
+## Non-Root Edition ##
 See [linux-on-termux](https://github.com/uzilla/linux-on-termux)
 
 
