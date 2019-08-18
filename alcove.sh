@@ -1,5 +1,5 @@
 #!/system/bin/sh
-
+#
 # MIT License
 #
 # Copyright (c) 2018-2019 urain39 & Kyono
@@ -23,10 +23,14 @@
 # SOFTWARE.
 
 
+# NOTE: Below exit codes also applied to sub-scripts,
+#       such as ${NEWROOT}/init.sh ...
+
 NO_ERROR=0
 ENV_ERROR=1
 PERM_ERROR=2
 BOOT_ERROR=3
+UNKNOW_ERROR=255
 
 # XXX: `id -u` may not work on android.
 if [ x"${UID}" = "x" ]; then
@@ -107,12 +111,13 @@ echo "/_/   \\\\_\\\\_|\\\\___\\\\___/ \\\\_/ \\\\___| v1.2.5"
 echo "                              "
 echo " A chroot scripts to run linux on termux."
 
-if [ -f /tmp/.alcove.running ]; then
+if [ -f /tmp/.alcove/alcove.running ]; then
   echo "Do not run /init.sh on a same system twice or more!"
-  exit 255
+  # NOTE: Exit code has been formatted.
+  exit \${UNKNOW_ERROR}
 fi
 
-echo "IS RUNNING" > /tmp/.alcove.running
+echo "IS RUNNING" > /tmp/.alcove/alcove.running
 
 #
 # Event-Hooks
@@ -140,11 +145,15 @@ print_failed() {
 }
 
 if [ -d /alcove-hooks ]; then
-  rm -rf /tmp/.alcove-hooks # Path-Safe
-  cp -rp /alcove-hooks /tmp/.alcove-hooks
+  rm -rf /tmp/.alcove/alcove-hooks # Path-Safe
+  cp -rp /alcove-hooks /tmp/.alcove/alcove-hooks
 
-  echo "Starting..."
-  for s in /tmp/.alcove-hooks/*; do
+  print_msg "Starting...\n"
+  for s in /tmp/.alcove/alcove-hooks/*; do
+    if [ ! -f ${s} ]; do
+      continue
+    fi
+
     print_msg "Starting \${s} ..."
     \${s} "start"
 
@@ -157,8 +166,12 @@ if [ -d /alcove-hooks ]; then
 
   su - root; ret=\${?}
 
-  echo "Stopping..."
-  ls /tmp/.alcove-hooks/* | sort -r | while read s; do
+  print_msg "Stopping...\n"
+  ls /tmp/.alcove/alcove-hooks/* | sort -r | while read s; do
+    if [ ! -f ${s} ]; do
+      continue
+    fi
+
     print_msg "Stopping \${s} ..."
     \${s} "stop"
 
@@ -173,7 +186,7 @@ else
 fi
 
 # Cleanup
-rm /tmp/.alcove.running
+rm /tmp/.alcove/alcove.running
 exit \${ret}
 INIT_SCRIPT
 
@@ -183,7 +196,7 @@ INIT_SCRIPT
 
 alcove_mount()
 {
-  if [ -f ${BOOT_DIR}/tmp/.alcove.mounted ]; then
+  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ]; then
     return
   fi
 
@@ -193,16 +206,20 @@ alcove_mount()
   mount -o bind /sys ${BOOT_DIR}/sys
   mount -t tmpfs tmpfs ${BOOT_DIR}/tmp
 
+  if [ ! -d ${BOOT_DIR}/tmp/.alcove ]; then
+    mkdir ${BOOT_DIR}/tmp/.alcove
+  fi
+
   if [ ! -d ${BOOT_DIR}/dev/shm ]; then
     mkdir ${BOOT_DIR}/dev/shm && mount -t tmpfs tmpfs ${BOOT_DIR}/dev/shm \
                               && chmod 1777 ${BOOT_DIR}/dev/shm
-    echo "SHM LOCKED" > ${BOOT_DIR}/tmp/.alcove.shmlock
+    echo "SHM LOCKED" > ${BOOT_DIR}/tmp/.alcove/alcove.shmlock
   fi
 
   if [ -f ${BOOT_DIR}/alcove.binds ]; then
     # Fix error when user edited /alcove.binds .
-    sed -n '/^#/d;/^[ \t]*$/d;p' ${BOOT_DIR}/alcove.binds > ${BOOT_DIR}/tmp/.alcove.binds
-    cat ${BOOT_DIR}/tmp/.alcove.binds | while read SRC_PNT DST_PNT; do
+    sed -n '/^#/d;/^[ \t]*$/d;p' ${BOOT_DIR}/alcove.binds > ${BOOT_DIR}/tmp/.alcove/alcove.binds
+    cat ${BOOT_DIR}/tmp/.alcove/alcove.binds | while read SRC_PNT DST_PNT; do
       mount -o bind ${SRC_PNT} ${BOOT_DIR}/${DST_PNT}
     done
   fi
@@ -211,18 +228,18 @@ alcove_mount()
     mount -o suid,remount /data
   fi
 
-  echo "IS MOUNTED" > ${BOOT_DIR}/tmp/.alcove.mounted
+  echo "IS MOUNTED" > ${BOOT_DIR}/tmp/.alcove/alcove.mounted
 }
 
 alcove_umount()
 {
-  if [ ! -f ${BOOT_DIR}/tmp/.alcove.mounted ]; then
+  if [ ! -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ]; then
     return
   fi
 
-  if [ -f ${BOOT_DIR}/tmp/.alcove.shmlock ]; then
+  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.shmlock ]; then
     umount ${BOOT_DIR}/dev/shm && rm -r ${BOOT_DIR}/dev/shm
-    rm ${BOOT_DIR}/tmp/.alcove.shmlock
+    rm ${BOOT_DIR}/tmp/.alcove/alcove.shmlock
   fi
 
   umount ${BOOT_DIR}/dev/pts
@@ -230,8 +247,8 @@ alcove_umount()
   umount ${BOOT_DIR}/proc
   umount ${BOOT_DIR}/sys
 
-  if [ -f ${BOOT_DIR}/tmp/.alcove.binds ]; then
-    cat ${BOOT_DIR}/tmp/.alcove.binds | while read SRC_PNT DST_PNT; do
+  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.binds ]; then
+    cat ${BOOT_DIR}/tmp/.alcove/alcove.binds | while read SRC_PNT DST_PNT; do
       umount ${BOOT_DIR}/${DST_PNT}
     done
   fi
@@ -240,7 +257,9 @@ alcove_umount()
     mount -o nosuid,remount /data
   fi
 
-  rm ${BOOT_DIR}/tmp/.alcove.mounted
+  rm ${BOOT_DIR}/tmp/.alcove/alcove.mounted
+  # Why and who cares about others?
+  rm -r ${BOOT_DIR}/tmp/.alcove
   umount ${BOOT_DIR}/tmp
 }
 
@@ -262,7 +281,7 @@ alcove_boot()
   }
 
 
-  [ -f ${BOOT_DIR}/tmp/.alcove.mounted ] && {
+  [ -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ] && {
     echo "Do not boot a same system twice or more!"
     exit ${BOOT_ERROR}
   }
