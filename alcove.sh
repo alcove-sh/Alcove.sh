@@ -150,7 +150,7 @@ if [ -d /alcove-hooks ]; then
 
   print_msg "Starting...\n"
   for s in /tmp/.alcove/alcove-hooks/*; do
-    if [ ! -f ${s} ]; do
+    if [ ! -f \${s} ]; then
       continue
     fi
 
@@ -168,7 +168,7 @@ if [ -d /alcove-hooks ]; then
 
   print_msg "Stopping...\n"
   ls /tmp/.alcove/alcove-hooks/* | sort -r | while read s; do
-    if [ ! -f ${s} ]; do
+    if [ ! -f \${s} ]; then
       continue
     fi
 
