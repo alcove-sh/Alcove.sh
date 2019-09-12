@@ -209,10 +209,10 @@ ALCOVE_BINDS
 
   # alcove hooks
   mkdir -p ${BOOT_DIR}/alcove-hooks
-  echo "" > ${BOOT_DIR}/alcove-hooks/00-alcove-hooks-keeper
+  echo "" > ${BOOT_DIR}/alcove-hooks/00-keeper
 
   chmod 755 ${BOOT_DIR}/alcove-hooks
-  chmod 644 ${BOOT_DIR}/alcove-hooks/00-alcove-hooks-keeper
+  chmod 644 ${BOOT_DIR}/alcove-hooks/00-keeper
 }
 
 alcove_mount()
