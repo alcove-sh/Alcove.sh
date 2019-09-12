@@ -1,4 +1,9 @@
-# INTERNAL SDCARD(5.1)
-#/storage/sdcard0  /mnt/intsd
-# EXTERNAL SDCARD(5.1)
-#/storage/sdcard1  /mnt/extsd
+# Syntax:
+#   source_dir  newroot_dir
+#   Use '#' at begin of a line to comment it.
+
+# Example:
+
+# sdcard
+/sdcard  /mnt/intsd
+

@@ -1,0 +1,34 @@
+#! /bin/sh
+
+# Filename: /alcove-hooks/33-aria2
+
+NAME="aria2"
+COMMAND="/usr/bin/aria2c"
+PIDFILE="/var/run/${NAME}.pid"
+
+start() {
+  stop > /dev/null 2>&1
+  nohup ${COMMAND} --conf-path=/root/.aria2/aria2.conf \
+                --enable-rpc=true > /dev/null 2>&1 &
+  echo ${!} > ${PIDFILE}
+}
+
+stop() {
+  kill -s 15 $(cat ${PIDFILE})
+
+  while ps -U root -ef | grep ${COMMAND} | grep -- "--enable-rpc" > /dev/null 2>&1; do
+    kill -s 15 $(cat ${PIDFILE})
+    sleep 1
+  done
+
+  rm -f ${PIDFILE}
+}
+
+case "${1}" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+esac
