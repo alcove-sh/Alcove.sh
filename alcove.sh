@@ -202,17 +202,43 @@ INIT_SCRIPT
 # Example:
 
 # sdcard
-#/sdcard  /mnt/intsd
+/sdcard  /mnt/intsd
 ALCOVE_BINDS
 
   chmod 644 ${BOOT_DIR}/alcove.binds
 
+  # mount point
+  mkdir -p ${BOOT_DIR}/mnt/intsd
+  mkdir -p ${BOOT_DIR}/mnt/extsd
+
+  chmod 755 ${BOOT_DIR}/mnt/intsd
+  chmod 755 ${BOOT_DIR}/mnt/extsd
+
   # alcove hooks
   mkdir -p ${BOOT_DIR}/alcove-hooks
-  echo "" > ${BOOT_DIR}/alcove-hooks/00-keeper
+  cat > ${BOOT_DIR}/alcove-hooks/00-alcover <<00_ALCOVER
+#! /bin/sh
+
+# Filename: /alcove-hooks/00-alcover
+
+NAME="alcover"
+
+start() { :; }
+
+stop() { :; }
+
+case "\${1}" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+esac
+00_ALCOVER
 
   chmod 755 ${BOOT_DIR}/alcove-hooks
-  chmod 644 ${BOOT_DIR}/alcove-hooks/00-keeper
+  chmod 755 ${BOOT_DIR}/alcove-hooks/00-alcover
 }
 
 alcove_mount()
