@@ -217,7 +217,7 @@ ALCOVE_BINDS
   # alcove hooks
   mkdir -p ${BOOT_DIR}/alcove-hooks
   cat > ${BOOT_DIR}/alcove-hooks/00-alcover <<00_ALCOVER
-#! /bin/sh
+#!/bin/sh
 
 # Filename: /alcove-hooks/00-alcover
 
