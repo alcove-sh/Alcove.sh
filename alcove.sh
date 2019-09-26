@@ -23,6 +23,9 @@
 # SOFTWARE.
 
 
+# Exit safely
+trap ":" INT HUP QUIT TERM
+
 # NOTE: Below exit codes also applied to sub-scripts,
 #       such as ${NEWROOT}/init.sh ...
 
@@ -41,7 +44,7 @@ if [ x"${UID}" = "x" ]; then
 fi
 
 BOOT_DIR=""
-umask 022 # Fix default permission.
+umask 022 # Fix default permissions.
 
 #
 # Prechecks
@@ -64,6 +67,8 @@ type chroot > /dev/null 2>&1 || {
 
 show_help()
 {
+  # NOTE: '${0}' always is same in script,
+  #       it is name of script.
   cat <<HELP
 alcove - a script to run linux on termux.
 
@@ -75,19 +80,13 @@ See also:
 HELP
 }
 
-check_env()
-{
-  if [ x${BOOT_DIR} = "x" ] || [ ! -d ${BOOT_DIR} ]; then
-    echo "Not found path [${BOOT_DIR}]!"
-    exit ${ENV_ERROR}
-  fi
-  [ "${BOOT_DIR}" = "/" ] && exit ${ENV_ERROR}
-}
-
 alcove_init()
 {
   cat > ${BOOT_DIR}/init.sh <<INIT_SCRIPT
 #!/bin/sh
+
+# Exit safely
+trap ":" INT HUP QUIT TERM
 
 unset PREFIX TMPDIR HOME SHELL
 unset LD_LIBRARY_PATH HISTFILE
@@ -202,7 +201,7 @@ INIT_SCRIPT
 # Example:
 
 # sdcard
-/sdcard  /mnt/intsd
+#/sdcard  /mnt/intsd
 ALCOVE_BINDS
 
   chmod 644 ${BOOT_DIR}/alcove.binds
@@ -219,22 +218,8 @@ ALCOVE_BINDS
   cat > ${BOOT_DIR}/alcove-hooks/00-alcover <<00_ALCOVER
 #!/bin/sh
 
-# Filename: /alcove-hooks/00-alcover
-
-NAME="alcover"
-
-start() { :; }
-
-stop() { :; }
-
-case "\${1}" in
-  start)
-    start
-    ;;
-  stop)
-    stop
-    ;;
-esac
+# Do nothing, always exit 0
+exit 0
 00_ALCOVER
 
   chmod 755 ${BOOT_DIR}/alcove-hooks
@@ -345,9 +330,17 @@ main()
     exit ${NO_ERROR}
   fi
 
-  BOOT_DIR=`cd ${2}; pwd` > /dev/null 2>&1
+  BOOT_DIR=${2}
 
-  check_env
+  # NOTE: 'test -d ${BOOT_DIR}' -> 'test -d'
+  #       It's always return 0, so we need quote it.
+  if [ ! -d "${BOOT_DIR}" ]; then
+    echo "Not found path [${BOOT_DIR}]!"
+    exit ${ENV_ERROR}
+  fi
+
+  [ "${BOOT_DIR}" = "/" ] && exit ${ENV_ERROR}
+
   case "${1}" in
   "init")
     alcove_init
