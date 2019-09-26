@@ -332,7 +332,7 @@ main()
 
   BOOT_DIR=${2}
 
-  # NOTE: 'test -d ${BOOT_DIR}' -> 'test -d'
+  # NOTE: When 'test -d ${BOOT_DIR}' -> 'test -d'
   #       It's always return 0, so we need quote it.
   if [ ! -d "${BOOT_DIR}" ]; then
     echo "Not found path [${BOOT_DIR}]!"
