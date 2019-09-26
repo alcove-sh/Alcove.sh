@@ -38,9 +38,9 @@ UNKNOW_ERROR=255
 # XXX: `id -u` may not work on android.
 if [ x"${UID}" = "x" ]; then
   UID=`id`
-  UID=${UID#*=}
-  UID=${UID%% *}
-  UID=${UID%\(*}
+  UID="${UID#*=}"
+  UID="${UID%% *}"
+  UID="${UID%\(*}"
 fi
 
 BOOT_DIR=""
@@ -67,7 +67,7 @@ type chroot > /dev/null 2>&1 || {
 
 show_help()
 {
-  # NOTE: '${0}' always is same in script,
+  # NOTE: "${0}" always is same in script,
   #       it is name of script.
   cat <<HELP
 alcove - a script to run linux on termux.
@@ -82,7 +82,7 @@ HELP
 
 alcove_init()
 {
-  cat > ${BOOT_DIR}/init.sh <<INIT_SCRIPT
+  cat > "${BOOT_DIR}/init.sh" <<INIT_SCRIPT
 #!/bin/sh
 
 # Exit safely
@@ -149,14 +149,14 @@ if [ -d /alcove-hooks ]; then
 
   print_msg "Starting...\n"
   for s in /tmp/.alcove/alcove-hooks/*; do
-    if [ ! -f \${s} ] || [ ! -x \${s} ]; then
+    if [ ! -f "\${s}" ] || [ ! -x "\${s}" ]; then
       continue
     fi
 
     print_msg "Starting \${s} ..."
-    \${s} "start"
+    "\${s}" "start"
 
-    if [ \${?} = 0 ]; then
+    if [ "\${?}" = 0 ]; then
       print_ok "\${s}"
     else
       print_failed "\${s}"
@@ -167,14 +167,14 @@ if [ -d /alcove-hooks ]; then
 
   print_msg "Stopping...\n"
   ls /tmp/.alcove/alcove-hooks/* | sort -r | while read s; do
-    if [ ! -f \${s} ] || [ ! -x \${s} ]; then
+    if [ ! -f "\${s}" ] || [ ! -x "\${s}" ]; then
       continue
     fi
 
     print_msg "Stopping \${s} ..."
-    \${s} "stop"
+    "\${s}" "stop"
 
-    if [ \${?} = 0 ]; then
+    if [ "\${?}" = 0 ]; then
       print_ok "\${s}"
     else
       print_failed "\${s}"
@@ -193,7 +193,7 @@ INIT_SCRIPT
   chmod 750 "${BOOT_DIR}/init.sh"
 
   # alcove binds
-  cat > ${BOOT_DIR}/alcove.binds <<ALCOVE_BINDS
+  cat > "${BOOT_DIR}/alcove.binds" <<ALCOVE_BINDS
 # Syntax:
 #   source_dir  newroot_dir
 #   Use '#' at begin of a line to comment it.
@@ -215,7 +215,7 @@ ALCOVE_BINDS
 
   # alcove hooks
   mkdir -p "${BOOT_DIR}/alcove-hooks"
-  cat > ${BOOT_DIR}/alcove-hooks/00-alcover <<00_ALCOVER
+  cat > "${BOOT_DIR}/alcove-hooks/00-alcover" <<00_ALCOVER
 #!/bin/sh
 
 # Do nothing, always exit 0
@@ -228,7 +228,7 @@ exit 0
 
 alcove_mount()
 {
-  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ]; then
+  if [ -f "${BOOT_DIR}/tmp/.alcove/alcove.mounted" ]; then
     return
   fi
 
@@ -238,21 +238,21 @@ alcove_mount()
   mount -o bind /sys "${BOOT_DIR}/sys"
   mount -t tmpfs tmpfs "${BOOT_DIR}/tmp"
 
-  if [ ! -d ${BOOT_DIR}/tmp/.alcove ]; then
+  if [ ! -d "${BOOT_DIR}/tmp/.alcove" ]; then
     mkdir "${BOOT_DIR}/tmp/.alcove"
   fi
 
-  if [ ! -d ${BOOT_DIR}/dev/shm ]; then
-    mkdir ${BOOT_DIR}/dev/shm && mount -t tmpfs tmpfs ${BOOT_DIR}/dev/shm \
+  if [ ! -d "${BOOT_DIR}/dev/shm" ]; then
+    mkdir "${BOOT_DIR}/dev/shm" && mount -t tmpfs tmpfs "${BOOT_DIR}/dev/shm" \
                               && chmod 1777 "${BOOT_DIR}/dev/shm"
     echo "SHM LOCKED" > "${BOOT_DIR}/tmp/.alcove/alcove.shmlock"
   fi
 
-  if [ -f ${BOOT_DIR}/alcove.binds ]; then
+  if [ -f "${BOOT_DIR}/alcove.binds" ]; then
     # Fix error when user edited /alcove.binds .
-    sed -n '/^#/d;/^[ \t]*$/d;p' ${BOOT_DIR}/alcove.binds > "${BOOT_DIR}/tmp/.alcove/alcove.binds"
-    cat ${BOOT_DIR}/tmp/.alcove/alcove.binds | while read SRC_PNT DST_PNT; do
-      mount -o bind ${SRC_PNT} "${BOOT_DIR}/${DST_PNT}"
+    sed -n '/^#/d;/^[ \t]*$/d;p' "${BOOT_DIR}/alcove.binds" > "${BOOT_DIR}/tmp/.alcove/alcove.binds"
+    cat "${BOOT_DIR}/tmp/.alcove/alcove.binds" | while read SRC_PNT DST_PNT; do
+      mount -o bind "${SRC_PNT}" "${BOOT_DIR}/${DST_PNT}"
     done
   fi
 
@@ -265,12 +265,12 @@ alcove_mount()
 
 alcove_umount()
 {
-  if [ ! -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ]; then
+  if [ ! -f "${BOOT_DIR}/tmp/.alcove/alcove.mounted" ]; then
     return
   fi
 
-  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.shmlock ]; then
-    umount ${BOOT_DIR}/dev/shm && rm -r "${BOOT_DIR}/dev/shm"
+  if [ -f "${BOOT_DIR}/tmp/.alcove/alcove.shmlock" ]; then
+    umount "${BOOT_DIR}/dev/shm" && rm -r "${BOOT_DIR}/dev/shm"
     rm "${BOOT_DIR}/tmp/.alcove/alcove.shmlock"
   fi
 
@@ -279,8 +279,8 @@ alcove_umount()
   umount "${BOOT_DIR}/proc"
   umount "${BOOT_DIR}/sys"
 
-  if [ -f ${BOOT_DIR}/tmp/.alcove/alcove.binds ]; then
-    cat ${BOOT_DIR}/tmp/.alcove/alcove.binds | while read SRC_PNT DST_PNT; do
+  if [ -f "${BOOT_DIR}/tmp/.alcove/alcove.binds" ]; then
+    cat "${BOOT_DIR}/tmp/.alcove/alcove.binds" | while read SRC_PNT DST_PNT; do
       umount "${BOOT_DIR}/${DST_PNT}"
     done
   fi
@@ -298,7 +298,7 @@ alcove_umount()
 alcove_boot()
 {
   unset LD_PRELOAD
-  if [ ! -f ${BOOT_DIR}/etc/.resolv.conf.ok ]; then
+  if [ ! -f "${BOOT_DIR}/etc/.resolv.conf.ok" ]; then
     rm -f "${BOOT_DIR}/etc/resolv.conf"
     echo "nameserver 8.8.4.4" > "${BOOT_DIR}/etc/resolv.conf"
     echo "nameserver 8.8.8.8" >> "${BOOT_DIR}/etc/resolv.conf"
@@ -306,34 +306,32 @@ alcove_boot()
     echo "DNS IS OK" > "${BOOT_DIR}/etc/.resolv.conf.ok"
   fi
 
-  [ ! -f ${BOOT_DIR}/init.sh ] && {
+  [ ! -f "${BOOT_DIR}/init.sh" ] && {
     echo "Not found [${BOOT_DIR}/init.sh]"
     echo "Have you run ${0##*/} init?"
     exit "${BOOT_ERROR}"
   }
 
 
-  [ -f ${BOOT_DIR}/tmp/.alcove/alcove.mounted ] && {
+  [ -f "${BOOT_DIR}/tmp/.alcove/alcove.mounted" ] && {
     echo "Do not boot a same system twice or more!"
     exit "${BOOT_ERROR}"
   }
 
   alcove_mount
-  chroot ${BOOT_DIR} /init.sh
+  chroot "${BOOT_DIR}" /init.sh
   alcove_umount
 }
 
 main()
 {
-  if [ ${#} -lt 2 ]; then
+  if [ "${#}" -lt 2 ]; then
     show_help
     exit "${NO_ERROR}"
   fi
 
   BOOT_DIR="${2}"
 
-  # NOTE: When 'test -d ${BOOT_DIR}' -> 'test -d'
-  #       It's always return 0, so we need quote it.
   if [ ! -d "${BOOT_DIR}" ]; then
     echo "Not found path [${BOOT_DIR}]!"
     exit "${ENV_ERROR}"
