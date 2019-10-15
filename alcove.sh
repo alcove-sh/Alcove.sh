@@ -35,9 +35,9 @@ PERM_ERROR=2
 BOOT_ERROR=3
 UNKNOW_ERROR=255
 
-# XXX: `id -u` may not work on android.
+# XXX: '$(id -u)' may not work on android.
 if [ x"${UID}" = "x" ]; then
-  UID=`id`
+  UID=$(id)
   UID="${UID#*=}"
   UID="${UID%% *}"
   UID="${UID%\(*}"
@@ -251,9 +251,9 @@ alcove_mount()
   if [ -f "${BOOT_DIR}/alcove.binds" ]; then
     # Fix error when user edited /alcove.binds .
     sed -n '/^#/d;/^[ \t]*$/d;p' "${BOOT_DIR}/alcove.binds" > "${BOOT_DIR}/tmp/.alcove/alcove.binds"
-    cat "${BOOT_DIR}/tmp/.alcove/alcove.binds" | while read SRC_PNT DST_PNT; do
+    while read SRC_PNT DST_PNT; do
       mount -o bind "${SRC_PNT}" "${BOOT_DIR}/${DST_PNT}"
-    done
+    done < "${BOOT_DIR}/tmp/.alcove/alcove.binds" 
   fi
 
   if [ -d /data ] && [ -d /sdcard ]; then
@@ -280,9 +280,9 @@ alcove_umount()
   umount "${BOOT_DIR}/sys"
 
   if [ -f "${BOOT_DIR}/tmp/.alcove/alcove.binds" ]; then
-    cat "${BOOT_DIR}/tmp/.alcove/alcove.binds" | while read SRC_PNT DST_PNT; do
+    while read SRC_PNT DST_PNT; do
       umount "${BOOT_DIR}/${DST_PNT}"
-    done
+    done < "${BOOT_DIR}/tmp/.alcove/alcove.binds" 
   fi
 
   if [ -d /data ] && [ -d /sdcard ]; then
