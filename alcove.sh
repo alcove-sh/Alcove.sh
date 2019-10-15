@@ -166,7 +166,7 @@ if [ -d /alcove-hooks ]; then
   su - root; ret="\${?}"
 
   print_msg "Stopping...\n"
-  ls /tmp/.alcove/alcove-hooks/* | sort -r | while read s; do
+  ls /tmp/.alcove/alcove-hooks/* | sort -r | while read -r s; do
     if [ ! -f "\${s}" ] || [ ! -x "\${s}" ]; then
       continue
     fi
@@ -251,7 +251,7 @@ alcove_mount()
   if [ -f "${BOOT_DIR}/alcove.binds" ]; then
     # Fix error when user edited /alcove.binds .
     sed -n '/^#/d;/^[ \t]*$/d;p' "${BOOT_DIR}/alcove.binds" > "${BOOT_DIR}/tmp/.alcove/alcove.binds"
-    while read SRC_PNT DST_PNT; do
+    while read -r SRC_PNT DST_PNT; do
       mount -o bind "${SRC_PNT}" "${BOOT_DIR}/${DST_PNT}"
     done < "${BOOT_DIR}/tmp/.alcove/alcove.binds" 
   fi
@@ -280,7 +280,7 @@ alcove_umount()
   umount "${BOOT_DIR}/sys"
 
   if [ -f "${BOOT_DIR}/tmp/.alcove/alcove.binds" ]; then
-    while read SRC_PNT DST_PNT; do
+    while read -r SRC_PNT DST_PNT; do
       umount "${BOOT_DIR}/${DST_PNT}"
     done < "${BOOT_DIR}/tmp/.alcove/alcove.binds" 
   fi
