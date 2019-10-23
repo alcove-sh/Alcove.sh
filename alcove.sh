@@ -33,11 +33,11 @@ NO_ERROR=0
 ENV_ERROR=1
 PERM_ERROR=2
 BOOT_ERROR=3
-UNKNOW_ERROR=255
+UNKNOWN_ERROR=255
 
 # XXX: '$(id -u)' may not work on android.
 if [ x"${UID}" = "x" ]; then
-  UID=$(id)
+  UID="$(id)"
   UID="${UID#*=}"
   UID="${UID%% *}"
   UID="${UID%\(*}"
@@ -113,7 +113,7 @@ echo " A chroot scripts to run linux on termux."
 if [ -f /tmp/.alcove/alcove.running ]; then
   echo "Do not run /init.sh on a same system twice or more!"
   # NOTE: Exit code has been formatted.
-  exit "${UNKNOW_ERROR}"
+  exit "${UNKNOWN_ERROR}"
 fi
 
 echo "IS RUNNING" > /tmp/.alcove/alcove.running
