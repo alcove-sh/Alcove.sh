@@ -17,27 +17,27 @@ EOF
 patchGroup() {
     [ -e /etc/group ] || {
         echo "Do not run this script at outside!"
-        exit 1;
-    };
+        exit 1
+    }
     grep -q "net_bt_admin" /etc/group || {
         groupList >> /etc/group
-    };
+    }
 }
 
 patchUser() {
-    local user="$1"
-    [ x$user = "x" ] && return;
+    local user="${1}"
+    [ x${user} = "x" ] && return
     groupList | while read group; do
-        group=$(echo $group | cut -d':' -f1)
-        gpasswd -a "$user" $group || return;
+        group=$(echo ${group} | cut -d':' -f1)
+        gpasswd -a "${user}" ${group} || return
     done
 }
 
 main() {
-    [ $# -lt 1 ] && {
-        echo "$0 <username>"
-        exit 0;
-    }; local user="$1";
-    patchGroup;
-    patchUser "$user";
-}; main "$@";
+    [ ${#} -lt 1 ] && {
+        echo "${0} <username>"
+        exit 0
+    }; local user="${1}";
+    patchGroup
+    patchUser "${user}"
+}; main "${@}";
