@@ -1,3 +1,4 @@
+#!/system/bin/sh
 trap ":" HUP INT QUIT TERM
 NO_ERROR=0
 ENV_ERROR=1
